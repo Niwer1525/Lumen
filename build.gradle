@@ -7,6 +7,7 @@ plugins {
 group = 'niwer.lumen'
 def releaseVersion = findProperty('releaseVersion') ?: '1.0.0'
 version = releaseVersion
+def publishedArtifactId = 'lumen-logger'
 
 repositories {
     mavenCentral() // Use Maven Central for resolving dependencies.
@@ -26,11 +27,15 @@ java {
     }
 }
 
+tasks.named('jar') {
+    archiveBaseName = publishedArtifactId
+}
+
 publishing {
     publications {
         gpr(MavenPublication) {
-            groupId = 'com.github.niwer1525'
-            artifactId = 'Lumen'             // Should be the same as the repository name
+            groupId = 'niwer.lumen'
+            artifactId = publishedArtifactId
             version = project.version
             from components.java
         }

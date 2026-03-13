@@ -1,5 +1,5 @@
 # Lumen a pure Java lightweight logger.
-Lumen 
+Lumen is a pure Java lightweight logger. It is designed to be simple to use and to be easily extensible. Lumen is not a logging framework, it is a logging system. It provides a way to log messages with the most basics configurations. You can use Lumen to log messages to the console, to a file, or to any other system you want by creating your own processors (Discord, Stoat, etc).
 
 ## Features
 - Container - A container is a logger. (For example you can have a container for messages printed by your server application which will send everything on discord and save to .log files)
@@ -10,6 +10,35 @@ Lumen
 - Colors - Lumen has a lot of colors
 
 # How to install
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/Niwer1525/Lumen?label=latest%20version&color=orange)
+Or [📥Download the jar](https://github.com/Niwer1525/Lumen/releases/latest/download/Lumen.jar)
+
+Gradle:
+```groovy
+repositories {
+    mavenCentral();
+}
+
+dependencies {
+    implementation 'niwer.lumen:lumen-logger:1.0.0'
+}
+```
+Maven:
+```xml
+<repositories>
+    <repository>
+        <id>maven-central</id>
+        <url>https://repo.maven.apache.org/maven2/</url>
+    </repository>
+</repositories>
+<dependencies>
+    <dependency>
+        <groupId>niwer.lumen</groupId>
+        <artifactId>lumen-logger</artifactId>
+        <version>0.0.0-test.20260313153224</version>
+    </dependency>
+</dependencies>
+```
 
 # How to use
 First of all, if you want a full Java break down, go in the `src/test/java/GlobalTest` Class.
