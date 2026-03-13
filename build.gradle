@@ -1,6 +1,11 @@
 plugins {
     id 'java'
+    id 'java-library'
+    id 'maven-publish'
 }
+
+group = 'niwer.lumen'
+version = '1.0.0'
 
 repositories {
     mavenCentral() // Use Maven Central for resolving dependencies.
@@ -17,6 +22,24 @@ dependencies {
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+publishing {
+    publications {
+        gpr(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/Niwer1525/Lumen"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 

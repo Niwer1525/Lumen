@@ -43,6 +43,17 @@ public class ContainerManager {
 		return container;
 	}
 
+	/**
+	 * Register an external application processor for the default container.
+	 * For exemple you can register a processor for discord that will send the mesage in a specific channel with the file attached if there is one, and so on.
+	 * 
+	 * @param processor The processor to register
+	 * @return The updated default container
+	 */
+	public static Container registerExternalProcessorForDefaultContainer(Processor processor) {
+		return registerExternalProcessor(ContainerManager.DEFAULT_CONTAINER, processor);
+	}
+
 	@Deprecated(since = "1.0.0")
 	public static void setupThreadExceptionHandler() {
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> Console.log("Uncaught exception in thread " + t.getName(), e).send());

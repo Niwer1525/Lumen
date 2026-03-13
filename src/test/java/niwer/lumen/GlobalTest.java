@@ -32,7 +32,7 @@ public class GlobalTest {
 
             /* Send exception */
             Console.log(new Exception("Test exception")).send();
-    
+            
             /* Send exception with "prefix" message */
             Console.log("This is a prefix for the error.", new Exception("Test exception")).send();
         }
@@ -44,11 +44,11 @@ public class GlobalTest {
 
                 To create your own types, we recommend you to use the "BasicLogType" class, which is a simple implementation of the "ILogType" interface
             */
-           final ILogType SQL = new BasicLogType("SQL", EnumLogColor.BLACK);
-           Console.log("This is a message with the SQL type").type(SQL).send();
+            final ILogType SQL = new BasicLogType("SQL", EnumLogColor.BLACK);
+            Console.log("This is a message with the SQL type").type(SQL).send();
 
-           final ILogType NETWORK = new BasicLogType("NETWORK", EnumLogColor.YELLOW);
-           Console.log("This is a message with the NETWORK type").type(NETWORK).send();
+            final ILogType NETWORK = new BasicLogType("NETWORK", EnumLogColor.YELLOW);
+            Console.log("This is a message with the NETWORK type").type(NETWORK).send();
            
             /*
                 There are also a few default types. See DefaultLogTypes and the default selected type for all logs is DefaultLogTypes.NONE, which won't show any type.
@@ -89,7 +89,7 @@ public class GlobalTest {
 
                 Note that in order to make your log sent to processor you have to use "Console.sendToProcessor()".
             */
-           ContainerManager.registerExternalProcessor(ContainerManager.DEFAULT_CONTAINER, (data, time, formattedMessage) -> {
+           ContainerManager.registerExternalProcessorForDefaultContainer((data, time, formattedMessage) -> {
                 Console.log("Received message in processor: " + formattedMessage).send(); // This is just to show that the message is received in the processor, you can remove this line and implement your own logic.
                 Console.log("%s ", data.isError()).container(data.container()).send(); // This is just to show that you can access the container of the message, you can remove this line and implement your own logic.
 
@@ -107,6 +107,13 @@ public class GlobalTest {
                 */
             });
             Console.log("This message will be in the .log file").sendToProcessor().error().send();
+
+            /* For custom container */
+            final var MY_CONTAINER = ContainerManager.registerContainer("MyContainer");
+            ContainerManager.registerExternalProcessor(MY_CONTAINER, (data, time, formattedMessage) -> {
+                // Do your custom processing logic here for MY_CONTAINER
+            });
+            Console.log("This message will be in the .log file").container(MY_CONTAINER).sendToProcessor().error().send();
         }
     }
 }
