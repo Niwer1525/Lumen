@@ -1,4 +1,4 @@
-package niwer.lumen.files;
+package niwer.lumen.container;
 
 import java.nio.charset.StandardCharsets;
 import java.util.logging.LogRecord;
@@ -19,10 +19,10 @@ public class Formatter extends java.util.logging.Formatter {
     @Override
     public String format(LogRecord record) {
         if(!IS_FILE_FORMATTER)
-            return record.getMessage(); // Don't format for console output, as the message is already formatted in Console.send()
+            return record.getMessage()+"\n"; // Don't format for console output, as the message is already formatted in Console.send()
 
         /* For files, just uncolorized the message and force it to UTF-8. */
-        final String UNCOLORIZED_MESSAGE = EnumLogColor.uncolorize(record.getMessage());
+        final String UNCOLORIZED_MESSAGE = EnumLogColor.uncolorize(record.getMessage()+"\n");
         final String UTF_8_MESSAGE = new String(UNCOLORIZED_MESSAGE.getBytes(), StandardCharsets.UTF_8);
         return UTF_8_MESSAGE;
     }

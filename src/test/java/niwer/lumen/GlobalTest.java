@@ -2,8 +2,11 @@ package niwer.lumen;
 
 import java.io.File;
 
-import niwer.lumen.files.ConsoleFileManager;
-import niwer.lumen.files.ContainerManager;
+import niwer.lumen.container.ConsoleFileManager;
+import niwer.lumen.container.ContainerManager;
+import niwer.lumen.types.BasicLogType;
+import niwer.lumen.types.DefaultLogTypes;
+import niwer.lumen.types.ILogType;
 
 /**
  * Lumen use a container based system.
@@ -13,6 +16,12 @@ import niwer.lumen.files.ContainerManager;
 public class GlobalTest {
 
     public static void main(String[] args) {
+        /*
+            First of all, You can call this function to ensure avoiding conflicts with other logging systems, such as java.util.logging, which may interfere with Lumen's logging if not properly configured.
+            By default, if you don't call this function the default print system will also receiv de message and print it. So you may see duplicate messages in the console.
+        */
+        ContainerManager.removeDefaultHandlers();
+
         /* This will use the default container */
         {
             /* Send basic message */
@@ -32,14 +41,23 @@ public class GlobalTest {
         {
             /*
                 Types are just a way to categorize your messages. For exemple you may want to categorize all messaged printed by your Client side code as "client" or all messages printed by your Server side code as "server", and so on.
+
+                To create your own types, we recommend you to use the "BasicLogType" class, which is a simple implementation of the "ILogType" interface
             */
-           //TODO
+           final ILogType SQL = new BasicLogType("SQL", EnumLogColor.BLACK);
+           Console.log("This is a message with the SQL type").type(SQL).send();
+
+           final ILogType NETWORK = new BasicLogType("NETWORK", EnumLogColor.YELLOW);
+           Console.log("This is a message with the NETWORK type").type(NETWORK).send();
+           
+            /*
+                There are also a few default types. See DefaultLogTypes and the default selected type for all logs is DefaultLogTypes.NONE, which won't show any type.
+            */
+            Console.log("This is a message with the NETWORK type").type(DefaultLogTypes.INFO).send();
         }
 
         /* Save to file */
         {
-            ContainerManager.removeDefaultHandlers(); // You can call this function to ensure avoiding conflicts with other logging systems, such as java.util.logging, which may interfere with Lumen's logging if not properly configured.
-
             /* Creating a container */
             final var MY_CONTAINER = ContainerManager.registerContainer("MyContainer");
 
@@ -66,8 +84,29 @@ public class GlobalTest {
         {
             /*
                 I wanted a way to log messages to custom places, such as a Discord channel or a Stoat channel, without having to change the code that logs the messages.
+
+                So to handle your own custom stuff, you have to register processors.
+
+                Note that in order to make your log sent to processor you have to use "Console.sendToProcessor()".
             */
-           //TODO
+           ContainerManager.registerExternalProcessor(ContainerManager.DEFAULT_CONTAINER, (data, time, formattedMessage) -> {
+                Console.log("Received message in processor: " + formattedMessage).send(); // This is just to show that the message is received in the processor, you can remove this line and implement your own logic.
+                Console.log("%s ", data.isError()).container(data.container()).send(); // This is just to show that you can access the container of the message, you can remove this line and implement your own logic.
+
+                /*
+                    Implement your custom processing logic here.
+
+                    // This is a pseudo code for example.
+                    JDABot.getChannelById("channel_id").sendMessage(formattedMessage).addFile(file).queue();
+
+                    JDABot.getChannelById("channel_id").createEmbed(embed -> {
+                        embed.setTitle("New log message");
+                        embed.setDescription(formattedMessage);
+                        embed.addField("File", file.getName(), false);
+                    }).addFile(file).queue();
+                */
+            });
+            Console.log("This message will be in the .log file").sendToProcessor().error().send();
         }
     }
 }

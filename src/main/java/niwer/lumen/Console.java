@@ -3,16 +3,29 @@ package niwer.lumen;
 import java.io.File;
 import java.util.logging.Level;
 
-import niwer.lumen.files.Container;
-import niwer.lumen.files.ContainerManager;
+import niwer.lumen.container.Container;
+import niwer.lumen.container.ContainerManager;
+import niwer.lumen.container.Processor;
+import niwer.lumen.types.DefaultLogTypes;
+import niwer.lumen.types.ILogType;
 
 public class Console {
     private Container container = ContainerManager.DEFAULT_CONTAINER;
     private Object message;
-    private EnumLogType type = EnumLogType.NONE;
+    private ILogType type = DefaultLogTypes.NONE;
     private boolean isError = false;
+    private boolean sendToProcessors = false;
+    private File file = null;
 
-    public Object getMessage() { return this.message; }
+    public Object message() { return this.message; }
+
+    public ILogType type() { return this.type; }
+
+    public boolean isError() { return this.isError; }
+
+    public Container container() { return this.container; }
+
+    public File file() { return this.file; }
 
     /**
      * Log a message to the console.
@@ -35,7 +48,9 @@ public class Console {
      * @return The Console instance for chaining
      */
     public static Console log(Object message) {
-        return log("%s", message);
+        final Console CONSOLE = new Console();
+        CONSOLE.message = message;
+        return CONSOLE;
     }
 
     /**
@@ -60,19 +75,24 @@ public class Console {
         return log(ConsoleUtils.stringify(t)).error();
 	}
 	
-    public Console type(EnumLogType type) {
+    public Console type(ILogType type) {
         if(type == null) throw new IllegalArgumentException("Log type cannot be null");
 
         this.type = type;
         return this;
     }
 
-    public Console showOnDiscord() {
-        throw new UnsupportedOperationException("Discord logging is not supported yet.");
+    public Console sendToProcessor() {
+        this.sendToProcessors = true;
+        return this;
     }
 
+    /**
+     * This will attach a file to the log, which can be used by external processors (e.g. a Discord processor that sends the log message and the file to a specific channel).
+     */
     public Console file(File file) {
-        throw new UnsupportedOperationException("File logging is not supported yet.");
+        this.file = file;
+        return this;
     }
 
     /**
@@ -105,11 +125,18 @@ public class Console {
     public void send() {
         if(message == null) return; // If no message, do nothing
 
+        final long TIME = System.currentTimeMillis();
         final String ERROR_PREFIX = isError ? EnumLogColor.RED + "[ERROR] " + EnumLogColor.RESET : "";
-        final String PREFIX = type == EnumLogType.NONE ? "" : type.color + "[" + type.name() + "] " + EnumLogColor.RESET;
-        final String TIMESTAMP = String.format("[%tT] ", System.currentTimeMillis());
+        final String PREFIX = type == DefaultLogTypes.NONE ? "" : type.color() + "[" + type.name() + "] " + EnumLogColor.RESET;
+        final String TIMESTAMP = String.format("[%tT] ", TIME);
         final String MESSAGE = String.format("%s%s%s%s%s", ConsoleUtils.getLineCaller(), TIMESTAMP, ERROR_PREFIX, PREFIX, message);
 
+        /* Log to the terminal */
         this.container.logger().log(Level.INFO, MESSAGE);
+
+        /* Send to processors */
+        if(this.sendToProcessors) {
+            for (final Processor PROCESSOR : this.container.processors()) PROCESSOR.process(this, TIME, MESSAGE);
+        }
     }
 }

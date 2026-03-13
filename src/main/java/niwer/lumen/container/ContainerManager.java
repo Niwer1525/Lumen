@@ -1,4 +1,4 @@
-package niwer.lumen.files;
+package niwer.lumen.container;
 
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
@@ -30,6 +30,19 @@ public class ContainerManager {
 		return new Container(name);
 	}
 	
+	/**
+	 * Register an external application processor.
+	 * For exemple you can register a processor for discord that will send the mesage in a specific channel with the file attached if there is one, and so on.
+	 * 
+	 * @param container The container to register the processor for
+	 * @param processor The processor to register
+	 * @return The updated container
+	 */
+	public static Container registerExternalProcessor(Container container, Processor processor) {
+		container.addProcessor(processor);
+		return container;
+	}
+
 	@Deprecated(since = "1.0.0")
 	public static void setupThreadExceptionHandler() {
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> Console.log("Uncaught exception in thread " + t.getName(), e).send());

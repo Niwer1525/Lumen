@@ -33,6 +33,22 @@ public class DebugTimeStamp {
     }
 
     /**
+     * Get the elapsed time since the creation of the timer in milliseconds.
+     * If the timer is stopped, the elapsed time is 0.
+     * @return The elapsed time in milliseconds.
+     */
+    public long elapsedTime() {
+        if(!isRunning) return 0; // If not running, return 0 (since the timer is stopped, the elapsed time is 0)
+        return System.currentTimeMillis() - startTime;
+    }
+
+    /**
+     * Check if the timer is still running.
+     * @return True if the timer is still running, false otherwise.
+     */
+    public boolean isRunning() { return this.isRunning; }
+
+    /**
      * Stops the current timer and returns a Console with the message and elapsed time since the creation of the time.
      * If the timer is already stopped, the function will return an empty Console so nothing can and will be printed.
      * 

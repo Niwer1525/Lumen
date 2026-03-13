@@ -1,6 +1,8 @@
-package niwer.lumen.files;
+package niwer.lumen.container;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
@@ -12,7 +14,8 @@ import java.util.logging.Logger;
  */
 public class Container {
 
-    private String NAME;
+    private final Set<Processor> PROCESSORS = new HashSet<>();
+    private final String NAME;
     private final ConsoleHandler HANDLER;
     private final Logger LOGGER;
 
@@ -33,14 +36,22 @@ public class Container {
     }
 
     /**
+     * Add a processor to the container, which will be called when a log is sent to this container.
+     * This can be used to modify the log message or perform additional actions (e.g. send the log message to a Discord channel).
+     */
+    protected void addProcessor(Processor processor) { this.PROCESSORS.add(processor); }
+
+    /**
      * Add a FileHandler to the container's logger.
      * @param fileHandler The FileHandler to add
      */
-    public void addFileHandler(FileHandler fileHandler) { this.LOGGER.addHandler(fileHandler); }
+    protected void addFileHandler(FileHandler fileHandler) { this.LOGGER.addHandler(fileHandler); }
 
     public ConsoleHandler handler() { return HANDLER; }
 
     public Logger logger() { return this.LOGGER; }
 
     public String name() { return this.NAME; }
+
+    public Set<Processor> processors() { return this.PROCESSORS; }
 }
