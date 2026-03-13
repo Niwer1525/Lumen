@@ -50,10 +50,15 @@ Maven:
 # How to use
 First of all, if you want a full Java break down, go in the `src/test/java/GlobalTest` Class.
 
+## Basics
+
 First to ensure Lumen works properly, you need to disable all other logging system.
 ```java
-ContainerManager.removeDefaultHandlers();
+LumenEngine.removeDefaultHandlers();
+// LumenEngine.disablePrintingFromDefaultContainer(); // This prevent the default container to print messages to the console by throwing an exception. It's not recommended to use it, but you can if you want to.
 ```
+
+## Logging
 
 Basic logging is really simple, you just need to do:
 ```java
@@ -67,7 +72,7 @@ Console
     .type(DefaultLogTypes.INFO) // Types are a way to categorize your messages. (Adds [INFO] to the message)
     .sendToProcessor() // Allows to send to other systems using processors, see below for more details
     .file(new File("file")) // Allows to attach file to message. You have to create processors to handle this. (No default handling)
-    .container(ContainerManager.DEFAULT_CONTAINER) // Or your custom container, see below for more details
+    .container(LumenEngine.DEFAULT_CONTAINER) // Or your custom container, see below for more details
     .send();
 ```
 The `log` function is declined in multiple functions to allow you to use formatting:
@@ -81,19 +86,23 @@ Console.log(new Exception("Test exception")).send(); // This will be automatical
 Console.log("This is a prefix for the error.", new Exception("Test exception")).send(); // This will be automatically marked as an error and will print the stacktrace
 ```
 
+## Containers
+
 You are not forced to create a container. Lumen has, of course, a default container that you can register file saver or processors to. But if you want to create your own container, you can do it like this:
 ```java
-final var MY_CONTAINER = ContainerManager.registerContainer("MyContainer");
+final var MY_CONTAINER = LumenEngine.registerContainer("MyContainer");
 ```
 
 The default container is called `DEFAULT_CONTAINER` and you can get it like this:
 ```java
-ContainerManager.DEFAULT_CONTAINER
+LumenEngine.DEFAULT_CONTAINER
 ```
+
+## Save to file
 
 To save your printed message for your container you can do :
 ```java
-final var MY_CONTAINER = ContainerManager.registerContainer("MyContainer");
+final var MY_CONTAINER = LumenEngine.registerContainer("MyContainer");
 final File FOLDER = new File("./logs/");
 ConsoleFileManager.registerFileFor(FOLDER, MY_CONTAINER, "the_base_name_of_the_file_for_my_container");
 ```
@@ -102,14 +111,29 @@ If you want to use the default container, you can do:
 final File FOLDER = new File("./logs/");
 ConsoleFileManager.registerFileForDefaultContainer(FOLDER, "the_base_name_of_the_file");
 ```
+The containers have some properties you can set. For example, you can choose to show the container name in the logs or not.
+```java
+final var MY_CONTAINER = LumenEngine.registerContainer("MyContainer");
+MY_CONTAINER.showNameInLogs(); // This will add [MyContainer] to the messages.
+```
+
+## Processors
 
 Processors are a way to process logged messages to send them to other systems. For example, you can use a processor to send logs to Discord. You can register a processor for a container like this:
 ```java
-final var MY_CONTAINER = ContainerManager.registerContainer("MyContainer");
-ContainerManager.registerExternalProcessor(MY_CONTAINER, (data, time, formattedMessage) -> {
+final var MY_CONTAINER = LumenEngine.registerContainer("MyContainer");
+LumenEngine.registerExternalProcessor(MY_CONTAINER, (data, time, formattedMessage) -> {
     // Do your custom processing logic here for MY_CONTAINER
 });
 ```
+Alternatively, you can also chain the `addProcessor` function directly on the container.
+```java
+final var MY_CONTAINER = LumenEngine.registerContainer("MyContainer").addProcessor((data, time, formattedMessage) -> {
+    // Do your custom processing logic here for MY_CONTAINER
+});
+```
+
+## Types
 
 Types are a way to categorize your messages. You can use the `BasicLogType` class which is a simple implementation of the `ILogType` interface. You can also create your own types by implementing the `ILogType` interface. To set the type of a message, you can do:
 ```java
@@ -122,4 +146,26 @@ Console.log("This is a message with the NETWORK type").type(NETWORK).send();
 There are few default types in `DefaultLogTypes` class. The default selected type for all logs is `DefaultLogTypes.NONE`, which won't show any type.
 ```java
 Console.log("This is a message with the NETWORK type").type(DefaultLogTypes.INFO).send();
+```
+
+## Timers
+
+Lumen provides a way to measure the time taken to execute a piece of code. You can use the `DebugTimer` class for this. To use it, you can do:
+```java
+final DebugTimeStamp TIMER = DebugTimer.start("MyTimer"); // ThreadName:MyTimer
+// Some code
+TIMER.stop("Message to log").send(); // This return a Console object (See previous sections for more details about Console)
+```
+Alternatively, you can simply do:
+```java
+final DebugTimeStamp TIMER = DebugTimer.start(); // This will use threadName:default
+// Some code
+TIMER.stopAndSend("Message to log"); // This will stop and send the message to the default container, with no settings applied. Perfect for fast debuging.
+```
+
+You can also restart a atimer
+```java
+final DebugTimeStamp TIMER = DebugTimer.start("MyTimer");
+// Some code
+TIMER.restart(); // ThreadName:MyTimerRestarted, this will reset the timer and start it again from THIS LINE.
 ```

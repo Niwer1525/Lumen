@@ -1,12 +1,13 @@
-package niwer.lumen.container;
+package niwer.lumen;
 
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import niwer.lumen.Console;
+import niwer.lumen.container.Container;
+import niwer.lumen.container.Processor;
 
-public class ContainerManager {
+public class LumenEngine {
 
     public static final Container DEFAULT_CONTAINER = registerContainer("Lumen-Default");
 
@@ -18,6 +19,16 @@ public class ContainerManager {
 		final Handler[] HANDLERS = ROOT_LOGGER.getHandlers();
 		for (final Handler HANDLER : HANDLERS) ROOT_LOGGER.removeHandler(HANDLER);
     }
+
+	/**
+	 * Disable printing from the default container.
+	 * This is useful if you don't want to use the default container.
+	 * 
+	 * @note If someone tries to print with the default container, this will cause Console.log().send() to throw an exception, so make sure to handle that if you disable printing from the default container.
+	 */
+	public static void disablePrintingFromDefaultContainer() {
+		DEFAULT_CONTAINER.disablePrinting();
+	}
 
 	/**
 	 * Register a new console logger/handler with custom name.
@@ -51,7 +62,7 @@ public class ContainerManager {
 	 * @return The updated default container
 	 */
 	public static Container registerExternalProcessorForDefaultContainer(Processor processor) {
-		return registerExternalProcessor(ContainerManager.DEFAULT_CONTAINER, processor);
+		return registerExternalProcessor(LumenEngine.DEFAULT_CONTAINER, processor);
 	}
 
 	@Deprecated(since = "1.0.0")

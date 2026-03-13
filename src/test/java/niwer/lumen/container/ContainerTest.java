@@ -3,9 +3,9 @@ package niwer.lumen.container;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.logging.FileHandler;
-
 import org.junit.jupiter.api.Test;
+
+import niwer.lumen.Console;
 
 class ContainerTest {
 
@@ -25,6 +25,28 @@ class ContainerTest {
 
         assertEquals(1, CONTAINER.processors().size());
         assertEquals(PROCESSOR, CONTAINER.processors().iterator().next());
+    }
+
+    @Test void disablePrinting() {
+        final Container CONTAINER = new Container("TestContainer");
+        assertEquals(true, CONTAINER.isPrintingEnabled());
+
+        CONTAINER.disablePrinting();
+        assertEquals(false, CONTAINER.isPrintingEnabled());
+
+        CONTAINER.enablePrinting();
+        assertEquals(true, CONTAINER.isPrintingEnabled());
+    }
+
+    @Test void showNameInLogs() {
+        final Container CONTAINER = new Container("TestContainer");
+        assertEquals(false, CONTAINER.shouldShowNameInLogs());
+
+        CONTAINER.showNameInLogs();
+        assertEquals(true, CONTAINER.shouldShowNameInLogs());
+
+        final String MESSAGE = (String) Console.log("Test message").container(CONTAINER).formattedMessage();
+        assert MESSAGE.contains("[TestContainer]") : "Log message should contain the container. MSG : " + MESSAGE;
     }
 
     @Test void registerFileHandler() throws Exception {

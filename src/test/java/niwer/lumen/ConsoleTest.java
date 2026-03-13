@@ -12,7 +12,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 import niwer.lumen.container.Container;
-import niwer.lumen.container.ContainerManager;
 import niwer.lumen.types.DefaultLogTypes;
 
 class ConsoleTest {
@@ -32,7 +31,7 @@ class ConsoleTest {
 
         /* Container */
         assertNotNull(console.container());
-        assertEquals(ContainerManager.DEFAULT_CONTAINER, console.container());
+        assertEquals(LumenEngine.DEFAULT_CONTAINER, console.container());
     }
 
     @Test void testType() {
@@ -42,17 +41,17 @@ class ConsoleTest {
     }
 
     @Test void testContainer() {
-        final Container MY_CONTAINER = ContainerManager.registerContainer("MyContainer");
+        final Container MY_CONTAINER = LumenEngine.registerContainer("MyContainer");
         Console console = Console.log("Hello %s", "world").container(MY_CONTAINER);
         assertEquals(MY_CONTAINER, console.container());
 
         console.container(null); // Should reset to default container
-        assertEquals(ContainerManager.DEFAULT_CONTAINER, console.container());
+        assertEquals(LumenEngine.DEFAULT_CONTAINER, console.container());
     }
 
     @Test void testProcessors() {
-        final Container MY_CONTAINER = ContainerManager.registerContainer("MyContainer");
-        ContainerManager.registerExternalProcessor(MY_CONTAINER, (data, time, formattedMessage) -> {
+        final Container MY_CONTAINER = LumenEngine.registerContainer("MyContainer");
+        LumenEngine.registerExternalProcessor(MY_CONTAINER, (data, time, formattedMessage) -> {
             assertTrue(true); // Just to check if the processor is called
         });
 
@@ -65,5 +64,12 @@ class ConsoleTest {
         Console console = Console.log((String) null);
         assertNull(console.message());
         console.send(); // Should do nothing
+    }
+
+    @Test void testSendWithPrintingDisabled() {
+        final Container MY_CONTAINER = LumenEngine.registerContainer("MY_CONTAINER");
+        MY_CONTAINER.disablePrinting();
+        Console console = Console.log("Hello %s", "world").container(MY_CONTAINER);
+        assertThrows(IllegalStateException.class, () -> console.send());
     }
 }

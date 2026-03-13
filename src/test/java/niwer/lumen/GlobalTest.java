@@ -3,7 +3,6 @@ package niwer.lumen;
 import java.io.File;
 
 import niwer.lumen.container.ConsoleFileManager;
-import niwer.lumen.container.ContainerManager;
 import niwer.lumen.types.BasicLogType;
 import niwer.lumen.types.DefaultLogTypes;
 import niwer.lumen.types.ILogType;
@@ -20,7 +19,9 @@ public class GlobalTest {
             First of all, You can call this function to ensure avoiding conflicts with other logging systems, such as java.util.logging, which may interfere with Lumen's logging if not properly configured.
             By default, if you don't call this function the default print system will also receiv de message and print it. So you may see duplicate messages in the console.
         */
-        ContainerManager.removeDefaultHandlers();
+        LumenEngine.removeDefaultHandlers();
+        // LumenEngine.disablePrintingFromDefaultContainer();
+        LumenEngine.DEFAULT_CONTAINER.enablePrinting(); // Force enabling the printing (Should not be required. Buf If for some reason you want to disable printing and then re-enable it. You can)
 
         /* This will use the default container */
         {
@@ -59,7 +60,7 @@ public class GlobalTest {
         /* Save to file */
         {
             /* Creating a container */
-            final var MY_CONTAINER = ContainerManager.registerContainer("MyContainer");
+            final var MY_CONTAINER = LumenEngine.registerContainer("MyContainer").showNameInLogs(); // "showNameInLogs" will add [MyContainer] to the messages.
 
             /* Once the container is registered, you simply call the "container" function of Console. */
             Console.log("This message will be logged to MyContainer").container(MY_CONTAINER).send();
@@ -89,7 +90,7 @@ public class GlobalTest {
 
                 Note that in order to make your log sent to processor you have to use "Console.sendToProcessor()".
             */
-           ContainerManager.registerExternalProcessorForDefaultContainer((data, time, formattedMessage) -> {
+           LumenEngine.registerExternalProcessorForDefaultContainer((data, time, formattedMessage) -> {
                 Console.log("Received message in processor: " + formattedMessage).send(); // This is just to show that the message is received in the processor, you can remove this line and implement your own logic.
                 Console.log("%s ", data.isError()).container(data.container()).send(); // This is just to show that you can access the container of the message, you can remove this line and implement your own logic.
 
@@ -109,10 +110,16 @@ public class GlobalTest {
             Console.log("This message will be in the .log file").sendToProcessor().error().send();
 
             /* For custom container */
-            final var MY_CONTAINER = ContainerManager.registerContainer("MyContainer");
-            ContainerManager.registerExternalProcessor(MY_CONTAINER, (data, time, formattedMessage) -> {
+            final var MY_CONTAINER = LumenEngine.registerContainer("MyContainer");
+            LumenEngine.registerExternalProcessor(MY_CONTAINER, (data, time, formattedMessage) -> {
                 // Do your custom processing logic here for MY_CONTAINER
             });
+
+            /*
+                Note you can also chain the addProcessor function directly on the container.
+                final var MY_CONTAINER = LumenEngine.registerContainer("MyContainer").addProcessor((data, time, formattedMessage) -> {});
+            */
+
             Console.log("This message will be in the .log file").container(MY_CONTAINER).sendToProcessor().error().send();
         }
     }

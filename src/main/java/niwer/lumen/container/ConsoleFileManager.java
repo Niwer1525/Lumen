@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 
 import niwer.lumen.ConsoleUtils;
+import niwer.lumen.LumenEngine;
 
 /**
  * @author Niwer
@@ -15,7 +16,7 @@ public class ConsoleFileManager {
 	 * Register a file handler to save logs (This will be the default handler)
 	 * @param folder The folder to save logs
 	 */
-	public static void registerFileForDefaultContainer(File folder, String fileName) { registerFileFor(folder, ContainerManager.DEFAULT_CONTAINER, fileName); }
+	public static void registerFileForDefaultContainer(File folder, String fileName) { registerFileFor(folder, LumenEngine.DEFAULT_CONTAINER, fileName); }
 
 	/**
 	 * Register a file handler to save logs

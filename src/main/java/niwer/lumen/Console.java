@@ -4,18 +4,21 @@ import java.io.File;
 import java.util.logging.Level;
 
 import niwer.lumen.container.Container;
-import niwer.lumen.container.ContainerManager;
 import niwer.lumen.container.Processor;
 import niwer.lumen.types.DefaultLogTypes;
 import niwer.lumen.types.ILogType;
 
 public class Console {
-    private Container container = ContainerManager.DEFAULT_CONTAINER;
+    private Container container = LumenEngine.DEFAULT_CONTAINER;
     private Object message;
     private ILogType type = DefaultLogTypes.NONE;
     private boolean isError = false;
     private boolean sendToProcessors = false;
     private File file = null;
+
+    public String formattedMessage() {
+        return this.formatMessage(System.currentTimeMillis());
+    }
 
     public Object message() { return this.message; }
 
@@ -101,11 +104,11 @@ public class Console {
      * @param container The container to use for this log
      * @return The Console instance for chaining
      * 
-     * @see ContainerManager.DEFAULT_CONTAINER
+     * @see LumenEngine.DEFAULT_CONTAINER
      * @see Container
      */
     public Console container(Container container) {
-        this.container = container == null ? ContainerManager.DEFAULT_CONTAINER : container;
+        this.container = container == null ? LumenEngine.DEFAULT_CONTAINER : container;
         return this;
     }
 
@@ -123,20 +126,28 @@ public class Console {
      * Send the log to the console.
      */
     public void send() {
+        if(!this.container.isPrintingEnabled()) throw new IllegalStateException("Cannot send log to console because printing is disabled for the container: " + this.container.name());
         if(message == null) return; // If no message, do nothing
 
+        /* Format the message */
         final long TIME = System.currentTimeMillis();
-        final String ERROR_PREFIX = isError ? EnumLogColor.RED + "[ERROR] " + EnumLogColor.RESET : "";
-        final String PREFIX = type == DefaultLogTypes.NONE ? "" : type.color() + "[" + type.name() + "] " + EnumLogColor.RESET;
-        final String TIMESTAMP = String.format("[%tT] ", TIME);
-        final String MESSAGE = String.format("%s%s%s%s%s", ConsoleUtils.getLineCaller(), TIMESTAMP, ERROR_PREFIX, PREFIX, message);
+        final String FORMATTED_MESSAGE = this.formatMessage(TIME);
 
         /* Log to the terminal */
-        this.container.logger().log(Level.INFO, MESSAGE);
+        this.container.logger().log(Level.INFO, FORMATTED_MESSAGE);
 
         /* Send to processors */
         if(this.sendToProcessors) {
-            for (final Processor PROCESSOR : this.container.processors()) PROCESSOR.process(this, TIME, MESSAGE);
+            for (final Processor PROCESSOR : this.container.processors()) PROCESSOR.process(this, TIME, FORMATTED_MESSAGE);
         }
+    }
+
+    private String formatMessage(long time) {
+        final String TIMESTAMP = String.format("[%tT] ", time);
+        final String CONTAINER_PREFIX = this.container.shouldShowNameInLogs() ? EnumLogColor.BLACK + "[" + this.container.name() + "] " + EnumLogColor.RESET : "";
+        final String ERROR_PREFIX = isError ? EnumLogColor.RED + "[ERROR] " + EnumLogColor.RESET : "";
+        final String PREFIX = type == DefaultLogTypes.NONE ? "" : type.color() + "[" + type.name() + "] " + EnumLogColor.RESET;
+        return String.format("%s%s%s%s%s%s", CONTAINER_PREFIX, ConsoleUtils.getLineCaller(), TIMESTAMP, ERROR_PREFIX, PREFIX, message);
+
     }
 }
