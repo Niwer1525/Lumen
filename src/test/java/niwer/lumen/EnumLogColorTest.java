@@ -2,6 +2,8 @@ package niwer.lumen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.awt.Color;
+
 import org.junit.jupiter.api.Test;
 
 class EnumLogColorTest {
@@ -9,5 +11,7 @@ class EnumLogColorTest {
         final  String COLORED_MSG = EnumLogColor.RED + "This is a red message." + EnumLogColor.RESET;
         final String UNCOLORED_MSG = EnumLogColor.uncolorize(COLORED_MSG);
         assertEquals("This is a red message.", UNCOLORED_MSG);
+
+        assertEquals(Color.RED, EnumLogColor.RED.color());
     }
 }

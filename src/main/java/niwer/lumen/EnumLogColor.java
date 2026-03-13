@@ -1,5 +1,7 @@
 package niwer.lumen;
 
+import java.awt.Color;
+
 /**
  * This can be used to add color to the console logs, by using the ANSI escape codes.
  * It is used in the Console class to add color to the log messages based on their type and error status.
@@ -8,15 +10,15 @@ package niwer.lumen;
  */
 public enum EnumLogColor {
     
-    RESET("\033[0m"),
-    BLACK("\033[30m"),
-    RED("\033[31m"),
-    GREEN("\033[32m"),
-    YELLOW("\033[33m"),
-    BLUE("\033[34m"),
-    PURPLE("\033[35m"),
-    CYAN("\033[36m"),
-    WHITE("\033[37m");
+    RESET("\033[0m", Color.WHITE),
+    BLACK("\033[30m", Color.BLACK),
+    RED("\033[31m", Color.RED),
+    GREEN("\033[32m", Color.GREEN),
+    YELLOW("\033[33m", Color.YELLOW),
+    BLUE("\033[34m", Color.BLUE),
+    PURPLE("\033[35m", Color.MAGENTA),
+    CYAN("\033[36m", Color.CYAN),
+    WHITE("\033[37m", Color.WHITE);
 
     /* Ansi Colors */
 	protected static final String ANSI_RESET = "\u001B[241m";
@@ -29,11 +31,17 @@ public enum EnumLogColor {
 	protected static final String ANSI_CYAN = "\u001B[36m";
 	protected static final String ANSI_WHITE = "\u001B[37m";
 
-    private final String code;
+    private final String CODE;
+    private final Color COLOR;
 
-    EnumLogColor(String code) { this.code = code; }
+    EnumLogColor(String code, Color color) {
+        this.CODE = code;
+        this.COLOR = color;
+    }
 
-    @Override public String toString() { return this.code; }
+    @Override public String toString() { return this.CODE; }
+
+    public Color color() { return this.COLOR; }
 
     /**
      * Remove ANSI color codes from a string.
