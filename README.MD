@@ -11,16 +11,17 @@ Lumen is a pure Java lightweight logger. It is designed to be simple to use and 
 
 # How to install
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Niwer1525/Lumen?label=latest%20version&color=orange)
-Or [📥Download the jar](https://github.com/Niwer1525/Lumen/releases/latest/download/Lumen.jar)
+Or [📥Download the jar](https://github.com/Niwer1525/Lumen/releases/latest/download/lumen-logger.jar)
 
 Gradle:
 ```groovy
 repositories {
     mavenCentral();
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    implementation 'niwer.lumen:lumen-logger:1.0.0'
+    implementation 'com.github.Niwer1525:Lumen:1.0.0'
 }
 ```
 Maven:
@@ -30,12 +31,16 @@ Maven:
         <id>maven-central</id>
         <url>https://repo.maven.apache.org/maven2/</url>
     </repository>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
 </repositories>
 <dependencies>
     <dependency>
-        <groupId>niwer.lumen</groupId>
-        <artifactId>lumen-logger</artifactId>
-        <version>0.0.0-test.20260313153224</version>
+        <groupId>com.github.Niwer1525</groupId>
+        <artifactId>Lumen</artifactId>
+        <version>1.0.0</version>
     </dependency>
 </dependencies>
 ```

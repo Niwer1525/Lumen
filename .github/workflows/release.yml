@@ -31,10 +31,13 @@ jobs:
       - name: Build JAR
         run: ./gradlew assemble
 
+      - name: Prepare Fixed Name JAR
+        run: cp build/libs/lumen-logger-*.jar build/libs/lumen-logger.jar
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/libs/*.jar
+          files: build/libs/lumen-logger.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
