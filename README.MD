@@ -13,7 +13,7 @@ Lumen is a pure Java lightweight logger. It is designed to be simple to use and 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Niwer1525/Lumen?label=latest%20version&color=orange)
 Or [📥Download the jar](https://github.com/Niwer1525/Lumen/releases/latest/download/lumen-logger.jar)
 
-View on JitPack : https://jitpack.io/#Niwer1525/Lumen/v1.0.1
+View on JitPack : https://jitpack.io/#Niwer1525/Lumen
 
 Gradle:
 ```groovy
